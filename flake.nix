@@ -31,23 +31,21 @@
       defaultPackage = pkgs.mkShell {
         buildInputs =  with pkgs; [
           rust
-          lld_12
-          clang_12
+          lld
           rust-analyzer
-          mesa
+          mesa mesa_drivers
+          linuxPackages.nvidia_x11_beta
           pkgconfig udev alsaLib lutris
-          x11 xorg.libXcursor xorg.libXrandr xorg.libXi
+          xorg.libxcb xorg.libX11 x11 xorg.libXcursor xorg.libXrandr xorg.libXi
           vulkan-tools vulkan-headers vulkan-loader vulkan-validation-layers
           # vscode-extensions.llvm-org.lldb-vscode
           # vscode-extensions.vadimcn.vscode-lldb
         ];
-        # RUSTFLAGS = "-C link-arg=-fuse-ld=lld -C target-cpu=native";
+        RUSTFLAGS = "-C link-arg=-fuse-ld=lld -C target-cpu=native -Z share-generics=y";
         RUST_BACKTRACE = "1";
-        shellHook =''
-          export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${pkgs.lib.makeLibraryPath [
-            pkgs.alsaLib pkgs.udev pkgs.vulkan-loader
-          ]}
-        '';
+        shellHook = ''export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${pkgs.lib.makeLibraryPath [
+          pkgs.alsaLib pkgs.udev pkgs.vulkan-loader
+        ]}"'';
       };
     }
   );
