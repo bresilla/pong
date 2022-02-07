@@ -25,22 +25,29 @@
       };
     in rec {
       packages.fol = naerskLib.buildPackage {
-          pname = "fol";
+          pname = "bevy";
           root = ./.;
         };
       defaultPackage = pkgs.mkShell {
         buildInputs =  with pkgs; [
-          # packages.fol
           rust
-          # lldb
-          rls
-          lld_10
+          lld_12
+          clang_12
           rust-analyzer
+          mesa
+          pkgconfig udev alsaLib lutris
+          x11 xorg.libXcursor xorg.libXrandr xorg.libXi
+          vulkan-tools vulkan-headers vulkan-loader vulkan-validation-layers
           # vscode-extensions.llvm-org.lldb-vscode
           # vscode-extensions.vadimcn.vscode-lldb
         ];
-        RUSTFLAGS = "-C link-arg=-fuse-ld=lld -C target-cpu=native";
+        # RUSTFLAGS = "-C link-arg=-fuse-ld=lld -C target-cpu=native";
         RUST_BACKTRACE = "1";
+        shellHook =''
+          export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${pkgs.lib.makeLibraryPath [
+            pkgs.alsaLib pkgs.udev pkgs.vulkan-loader
+          ]}
+        '';
       };
     }
   );
